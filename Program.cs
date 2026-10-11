@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.Json.Serialization;
 using GerenciadorDeTarefas.Data;
-using Microsoft.EntityFrameworkCore;
+using GerenciadorDeTarefas.Middleware;
 using GerenciadorDeTarefas.Models;
+using Microsoft.AspNetCore.Identity;
 using GerenciadorDeTarefas.Repositories;
 using GerenciadorDeTarefas.Repositories.Interfaces;
 using GerenciadorDeTarefas.Services;
 using GerenciadorDeTarefas.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,11 +19,31 @@ builder.Services.AddDbContext<AppDbContext>(
 );
 
 // Add services to the container.
+builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<ITarefaService, TarefaService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter()
+        );
+    });
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+    {
+        Title = "Gerenciador de Tarefas API",
+        Version = "v1",
+        Description = "API para gerenciamento de tarefas.",
+    });
+});
 
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -54,32 +76,17 @@ builder.Services
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    if (app.Environment.IsDevelopment())
-    {
-        var usuarioRepository = scope.ServiceProvider
-            .GetRequiredService<IUsuarioRepository>();
-
-        if (await usuarioRepository.ObterPorEmailAsync("teste@example.com") is null)
-        {
-            await usuarioRepository.AdicionarAsync(new Usuario
-            {
-                Nome = "Usuária de teste",
-                Email = "teste@example.com",
-                Senha = "Teste123!"
-            });
-        }
-    }
-}
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Gerenciador de Tarefas API v1");
+        options.RoutePrefix = string.Empty; 
+    });
 }
 
 app.UseHttpsRedirection();
@@ -91,5 +98,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    
+    await DbInitializer.InitializarAsync(dbContext);
+}
 
 app.Run();
