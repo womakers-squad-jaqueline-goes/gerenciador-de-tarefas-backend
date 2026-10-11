@@ -34,7 +34,15 @@ builder.Services
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+    {
+        Title = "Gerenciador de Tarefas API",
+        Version = "v1",
+        Description = "API para gerenciamento de tarefas.",
+    });
+});
 
 var app = builder.Build();
 
@@ -42,7 +50,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Gerenciador de Tarefas API v1");
+        options.RoutePrefix = string.Empty; 
+    });
 }
 
 app.UseHttpsRedirection();
