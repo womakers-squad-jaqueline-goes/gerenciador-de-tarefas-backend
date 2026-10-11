@@ -59,11 +59,11 @@ namespace GerenciadorDeTarefas.Controllers
                 DataDeVencimento = criarTarefaDto.DataDeVencimento
             };
 
-            var novaTarefa = await _tarefaService.CriarAsync(usuarioId, tarefa);
-            var response = MapearParaResponseDto(novaTarefa);
+            var tarefaCadastrada = await _tarefaService.CriarAsync(usuarioId, tarefa);
+            var response = MapearParaResponseDto(tarefaCadastrada);
 
             return Created(
-                $"/api/usuarios/{usuarioId}/tarefas/{novaTarefa.Id}",
+                $"/api/usuarios/{usuarioId}/tarefas/{tarefaCadastrada.Id}",
                 response
             );
         }
