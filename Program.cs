@@ -1,4 +1,5 @@
 using GerenciadorDeTarefas.Data;
+using GerenciadorDeTarefas.Middleware;
 using GerenciadorDeTarefas.Models;
 using Microsoft.AspNetCore.Identity;
 using GerenciadorDeTarefas.Repositories;
@@ -49,6 +50,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
