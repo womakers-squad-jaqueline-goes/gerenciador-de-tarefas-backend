@@ -1,4 +1,6 @@
 using GerenciadorDeTarefas.Data;
+using GerenciadorDeTarefas.Models;
+using Microsoft.AspNetCore.Identity;
 using GerenciadorDeTarefas.Repositories;
 using GerenciadorDeTarefas.Repositories.Interfaces;
 using GerenciadorDeTarefas.Services;
@@ -19,7 +21,9 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
 
 builder.Services.AddScoped<ITarefaService, TarefaService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
+builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
 builder.Services
     .AddControllers()
