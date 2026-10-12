@@ -1,6 +1,6 @@
 ﻿using GerenciadorDeTarefas.Enums;
 
-namespace GerenciadorDeTarefas.DTO.Tarefa
+namespace GerenciadorDeTarefas.DTOs.Tarefa
 {
     public class TarefaResponseDto
     {

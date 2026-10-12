@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace GerenciadorDeTarefas.DTOs;
+namespace GerenciadorDeTarefas.DTOs.Login;
 
 public class LoginDto
 {

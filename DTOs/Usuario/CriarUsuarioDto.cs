@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GerenciadorDeTarefas.DTO.Usuario
+namespace GerenciadorDeTarefas.DTOs.Usuario
 {
     public class CriarUsuarioDto
     {

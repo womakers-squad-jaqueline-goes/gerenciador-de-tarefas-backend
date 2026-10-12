@@ -1,4 +1,4 @@
-namespace GerenciadorDeTarefas.DTOs;
+namespace GerenciadorDeTarefas.DTOs.Login;
 
 public class LoginResponseDto
 {
