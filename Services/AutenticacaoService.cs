@@ -1,8 +1,10 @@
 using GerenciadorDeTarefas.Repositories.Interfaces;
-using GerenciadorDeTarefas.DTOs;
 using GerenciadorDeTarefas.Services.Interfaces;
 using GerenciadorDeTarefas.Models;
 using Microsoft.AspNetCore.Identity;
+using GerenciadorDeTarefas.DTOs.Login;
+using GerenciadorDeTarefas.Exceptions;
+
 namespace GerenciadorDeTarefas.Services;
 
 public class AutenticacaoService : IAutenticacaoService
@@ -17,24 +19,20 @@ public class AutenticacaoService : IAutenticacaoService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<LoginResponseDto?> AutenticarAsync(LoginDto login)
+    public async Task<LoginResponseDto> AutenticarAsync(LoginDto login)
     {
         var usuario = await _usuarioRepository.ObterPorEmailAsync(login.Email);
 
-        if (usuario is null)
-        {
-            return null;
-        }
+        if (usuario == null)
+            throw new UnauthorizedException("E-mail ou senha inválidos");
 
-        var resultado = _passwordHasher.VerifyHashedPassword(
-     usuario,
-     usuario.Senha,
-     login.Senha);
+        var senhaValida = _passwordHasher.VerifyHashedPassword(
+            usuario,
+            usuario.Senha,
+            login.Senha);
 
-        if (resultado == PasswordVerificationResult.Failed)
-        {
-            return null;
-        }
+        if (senhaValida == PasswordVerificationResult.Failed)
+            throw new UnauthorizedException("E-mail ou senha inválidos");
 
         return new LoginResponseDto
         {

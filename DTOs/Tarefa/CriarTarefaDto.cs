@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GerenciadorDeTarefas.DTO.Tarefa
+namespace GerenciadorDeTarefas.DTOs.Tarefa
 {
     public class CriarTarefaDto
     {

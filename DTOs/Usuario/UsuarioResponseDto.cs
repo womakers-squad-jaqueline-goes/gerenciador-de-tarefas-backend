@@ -1,4 +1,4 @@
-﻿namespace GerenciadorDeTarefas.DTO
+﻿namespace GerenciadorDeTarefas.DTOs.Usuario
 {
     public class UsuarioResponseDto
     {

@@ -45,7 +45,10 @@ namespace GerenciadorDeTarefas.Services
                 throw new ConflictException("Não é possível atualizar uma tarefa concluída.");
 
             if (!string.IsNullOrWhiteSpace(tarefa.Titulo))
+            {
+                await ValidarTituloDuplicadoAsync(usuarioId, tarefa.Titulo.Trim(), id);
                 tarefaExistente.Titulo = tarefa.Titulo.Trim();
+            }
 
             if (!string.IsNullOrWhiteSpace(tarefa.Descricao))
                 tarefaExistente.Descricao = tarefa.Descricao.Trim();
@@ -83,16 +86,7 @@ namespace GerenciadorDeTarefas.Services
 
             ValidarDataDeVencimento(tarefa.DataDeVencimento);
             
-            var tarefasUsuario = await _tarefaRepository.ObterPorUsuarioIdAsync(usuarioId);
-            
-            bool tarefaExistente = tarefasUsuario.Any(t => 
-                string.Equals(
-                    t.Titulo.Trim(), 
-                    tarefa.Titulo.Trim(), 
-                    StringComparison.OrdinalIgnoreCase));
-
-            if (tarefaExistente)
-                throw new ConflictException("Tarefa já cadastrada para este usuário.");
+            await ValidarTituloDuplicadoAsync(usuarioId, tarefa.Titulo.Trim());
 
             tarefa.UsuarioId = usuarioId;
             tarefa.Usuario = usuario;
@@ -112,8 +106,23 @@ namespace GerenciadorDeTarefas.Services
 
         private void ValidarDataDeVencimento(DateTime dataDeVencimento)
         {
-            if (dataDeVencimento < DateTime.Now)
-                throw new ConflictException("A data de vencimento não pode ser anterior à data atual.");
+            if (dataDeVencimento < DateTime.Today)
+                throw new BadRequestException("A data de vencimento não pode ser anterior à data atual.");
+        }
+
+        private async Task ValidarTituloDuplicadoAsync(Guid usuarioId, string titulo, Guid? tarefaId = null)
+        {
+            var tarefasUsuario = await _tarefaRepository.ObterPorUsuarioIdAsync(usuarioId);
+
+            bool tarefaDuplicada = tarefasUsuario.Any(t => 
+                t.Id != tarefaId && 
+                string.Equals(
+                    t.Titulo.Trim(), 
+                    titulo.Trim(), 
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (tarefaDuplicada)
+                throw new ConflictException("Já existe uma tarefa com este título para este usuário.");
         }
     }
 }

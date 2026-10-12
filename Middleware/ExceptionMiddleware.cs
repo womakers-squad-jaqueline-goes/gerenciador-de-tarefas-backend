@@ -1,3 +1,4 @@
+using GerenciadorDeTarefas.Exceptions;
 namespace GerenciadorDeTarefas.Middleware;
 
 public class ExceptionMiddleware
@@ -23,7 +24,7 @@ public class ExceptionMiddleware
         {
             _logger.LogError(
                 exception,
-                "Ocorreu uma exceção não tratada durante a requisição.");
+                "Ocorreu uma exceção não tratada durante o processamento da requisição.");
 
             if (context.Response.HasStarted)
             {
@@ -48,45 +49,13 @@ public class ExceptionMiddleware
     private static (int StatusCode, string Message) MapException(
         Exception exception)
     {
-        if (exception is InvalidOperationException)
+        return exception switch
         {
-            var message = exception.Message.Trim();
-
-            string[] notFoundMessages =
-            [
-                "Usuário não encontrado.",
-                "Tarefa não encontrada.",
-                "Tarefa não pertence ao usuário."
-            ];
-
-            string[] conflictMessages =
-            [
-                "E-mail já cadastrado.",
-                "Tarefa já cadastrada para este usuário.",
-                "A data de vencimento deve ser posterior à data atual."
-            ];
-
-            if (notFoundMessages.Contains(
-                    message,
-                    StringComparer.OrdinalIgnoreCase))
-            {
-                return (
-                    StatusCodes.Status404NotFound,
-                    message);
-            }
-
-            if (conflictMessages.Contains(
-                    message,
-                    StringComparer.OrdinalIgnoreCase))
-            {
-                return (
-                    StatusCodes.Status409Conflict,
-                    message);
-            }
-        }
-
-        return (
-            StatusCodes.Status500InternalServerError,
-            "Ocorreu um erro interno no servidor.");
+            NotFoundException => (StatusCodes.Status404NotFound, exception.Message),
+            ConflictException => (StatusCodes.Status409Conflict, exception.Message),
+            BadRequestException => (StatusCodes.Status400BadRequest, exception.Message),
+            UnauthorizedException => (StatusCodes.Status401Unauthorized, exception.Message),
+            _ => (StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.")
+        };
     }
 }
