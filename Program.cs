@@ -19,10 +19,9 @@ builder.Services.AddDbContext<AppDbContext>(
 );
 
 // Add services to the container.
-builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
-
 builder.Services.AddScoped<ITarefaService, TarefaService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
 
 builder.Services
     .AddControllers()
@@ -46,8 +45,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
+builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+
 
 builder.Services.AddCors(options =>
 {
