@@ -9,12 +9,10 @@ namespace GerenciadorDeTarefas.Repositories;
 public class UsuarioRepository : IUsuarioRepository
 {
     private readonly AppDbContext _context;
-    private readonly IPasswordHasher<Usuario> _passwordHasher;
 
-    public UsuarioRepository(AppDbContext context, IPasswordHasher<Usuario> passwordHasher)
+    public UsuarioRepository(AppDbContext context)
     {
         _context = context;
-        _passwordHasher = passwordHasher;
     }
 
     public async Task<Usuario?> ObterPorIdAsync(Guid id)
@@ -31,8 +29,6 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task AdicionarAsync(Usuario usuario)
     {
-        usuario.Senha = _passwordHasher.HashPassword(usuario, usuario.Senha);
-       
         await _context.Usuarios.AddAsync(usuario);
         await _context.SaveChangesAsync();
     }
