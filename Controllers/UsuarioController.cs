@@ -1,5 +1,4 @@
-﻿using GerenciadorDeTarefas.DTO;
-using GerenciadorDeTarefas.DTO.Usuario;
+﻿using GerenciadorDeTarefas.DTOs.Usuario;
 using GerenciadorDeTarefas.Models;
 using GerenciadorDeTarefas.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -34,10 +33,11 @@ namespace GerenciadorDeTarefas.Controllers
 
         [HttpPost]
         [EndpointSummary("Criar novo usuário")]
-        [EndpointDescription("Cria um novo usuário com os dados fornecidos.")]
-        [ProducesResponseType(typeof(CriarUsuarioDto), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [EndpointDescription("Cadastra um novo usuário com os dados fornecidos. O e-mail deve ser válido e não pode estar cadastrado para outro usuário.")]
+        [ProducesResponseType(typeof(UsuarioResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CriarAsync([FromBody] CriarUsuarioDto usuarioDto)
         {
             var usuarioCadastrado = await _usuarioService.CadastrarAsync(new Usuario
