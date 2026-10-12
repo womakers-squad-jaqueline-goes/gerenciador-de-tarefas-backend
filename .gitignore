@@ -55,3 +55,17 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# Visual Studio
+.vs/
+*.csproj.user
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
